@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>LYLYFOOD — Giới thiệu / Thực đơn / Đặt bàn / Album / Liên hệ</title>
+
+  <!-- Font Poppins -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    /* ===== THEME (match Figma) ===== */
+    :root{
+      --bg: #FFF3E2;
+      --header: #C59B5A;
+      --header-dark: #B07E3E;
+      --text: #4A3B23;
+      --muted: #8a7350;
+      --card: #ffffff;
+      --radius: 12px;
+      --container: 1100px;
+      --shadow: 0 12px 30px rgba(0,0,0,0.08);
+      --accent: #C59B5A;
+      --transition: 260ms cubic-bezier(.2,.9,.2,1);
+    }
+
+    /* ===== reset & base ===== */
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family:"Poppins",system-ui,-apple-system,"Segoe UI",Roboto,Arial;
+      background:var(--bg);
+      color:var(--text);
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+      line-height:1.5;
+    }
+    a{color:inherit}
+    .wrap{max-width:var(--container);margin:0 auto;padding:18px}
+
+    /* ===== header ===== */
+    header.site-header{
+      background:linear-gradient(180deg,var(--header),var(--header-dark));
+      color:#fff;
+      position:sticky;top:0;z-index:80;
+      box-shadow:0 8px 18px rgba(0,0,0,0.06);
+      border-bottom-left-radius:12px;border-bottom-right-radius:12px;
+    }
+    .header-inner{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 18px}
+    .brand{display:flex;align-items:center;gap:12px}
+    .brand img{width:68px;height:48px;object-fit:contain;border-radius:8px;background:#fff;padding:6px}
+    .brand .name{font-weight:800;letter-spacing:0.6px;color:#fff}
+    .brand .tag{font-size:12px;color:rgba(255,255,255,0.95);opacity:.95}
+
+    nav.main-nav{display:flex;gap:18px;align-items:center}
+    nav.main-nav a{color:white;text-decoration:none;font-weight:600;padding:8px 12px;border-radius:8px;transition:background var(--transition),transform var(--transition)}
+    nav.main-nav a:hover{background:rgba(255,255,255,0.08);transform:translateY(-2px)}
+    nav.main-nav a.active{background:rgba(255,255,255,0.12);box-shadow:inset 0 -2px rgba(0,0,0,0.03)}
+
+    .search-box{background:#E7D6B8;border-radius:8px;padding:6px 10px;display:flex;align-items:center}
+    .search-box input{border:none;background:transparent;outline:none;color:#333;font-weight:600;padding:6px;min-width:160px}
+
+    /* mobile header */
+    .mobile-toggle{display:none;border:0;background:transparent;color:#fff;font-size:22px;padding:8px;cursor:pointer}
+
+    /* ===== sections (each "page") ===== */
+    main{margin-top:18px;min-height:60vh}
+    section.page{display:none;opacity:0;transform:translateY(12px);transition:opacity var(--transition),transform var(--transition),visibility var(--transition);visibility:hidden;padding:18px}
+    section.page.active{display:block;opacity:1;transform:translateY(0);visibility:visible}
+
+    /* ===== HERO / ABOUT (match Figma layout) ===== */
+    .hero{
+      background-image: url('images/hero-food.jpg');
+      background-size: cover;
+      background-position: center;
+      border-radius:12px;
+      color:var(--text);
+      padding:72px 18px;
+      text-align:center;
+      box-shadow:var(--shadow);
+    }
+    .hero h1{font-size:34px;margin:0;color:var(--text);font-weight:800;text-shadow:0 2px 8px rgba(255,255,255,0.2)}
+    .hero h2{margin:8px 0 0;font-size:18px;color:var(--muted);font-weight:600}
+    .hero .msv{margin-top:8px;color:var(--muted);font-weight:600}
+
+    /* content two-column like Figma */
+    .content{display:flex;gap:24px;margin-top:22px;align-items:start}
+    .col-left{flex:1}
+    .col-right{width:320px;flex:0 0 320px}
+    .card{background:var(--card);padding:18px;border-radius:12px;box-shadow:var(--shadow)}
+    .card h3{margin:0 0 8px;color:var(--accent)}
+    .card p{margin:8px 0;color:var(--muted);font-weight:600}
+
+    .side-image{border-radius:12px;overflow:hidden}
+    .side-image img{width:100%;height:100%;object-fit:cover;display:block}
+
+    /* small menu preview / items */
+    .menu-preview{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:18px}
+    .preview-item{background:var(--card);border-radius:10px;padding:8px;text-align:center;box-shadow:0 8px 18px rgba(0,0,0,0.04)}
+    .preview-item img{width:100%;height:120px;object-fit:cover;border-radius:8px}
+    .preview-item h4{margin:10px 0 0;font-weight:700;color:var(--header-dark);text-transform:lowercase}
+
+    /* ===== MENU page ===== */
+    .menu-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+    .dish{background:var(--card);border-radius:12px;padding:14px;box-shadow:0 10px 26px rgba(0,0,0,0.04);display:flex;gap:12px;align-items:flex-start}
+    .dish img{width:110px;height:90px;object-fit:cover;border-radius:10px}
+    .dish h4{margin:0;font-size:16px;color:var(--header-dark)}
+    .dish p{margin:6px 0 0;color:var(--muted);font-weight:600}
+    .price{margin-top:8px;font-weight:800;color:var(--text)}
+
+    /* ===== BOOKING page ===== */
+    .booking-grid{display:grid;grid-template-columns:1fr 360px;gap:18px}
+    .form-row{display:flex;gap:10px;margin-bottom:10px}
+    .form-row .col{flex:1}
+    label{display:block;font-size:13px;margin-bottom:6px;color:var(--muted)}
+    input,select,textarea,button{width:100%;padding:10px;border-radius:8px;border:1px solid #eee;font-size:14px}
+    button.btn-primary{background:var(--accent);color:white;border:0;padding:10px 12px;border-radius:8px;cursor:pointer;font-weight:700}
+
+    /* ===== ALBUM page ===== */
+    .gallery{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+    .gallery img{width:100%;height:180px;object-fit:cover;border-radius:10px;display:block;box-shadow:0 8px 18px rgba(0,0,0,0.04)}
+
+    /* ===== CONTACT page ===== */
+    .contact-grid{display:grid;grid-template-columns:1fr 360px;gap:18px}
+    .contact-card{background:var(--card);padding:14px;border-radius:12px;box-shadow:var(--shadow)}
+    .socials a{display:inline-block;margin-right:8px;color:var(--accent);text-decoration:none;font-weight:700}
+
+    /* ===== footer ===== */
+    footer.site-footer{margin-top:18px;background:linear-gradient(180deg,var(--header),var(--header-dark));color:#fff;padding:18px;border-radius:10px;box-shadow:0 12px 30px rgba(0,0,0,0.06)}
+    footer .wrap{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+
+    /* ===== helpers & responsive ===== */
+    .muted{color:var(--muted)}
+    .center{text-align:center}
+    @media (max-width:1100px){
+      .menu-grid{grid-template-columns:repeat(2,1fr)}
+      .gallery{grid-template-columns:repeat(2,1fr)}
+      .content{flex-direction:column}
+      .col-right{width:100%;flex:auto}
+      .booking-grid{grid-template-columns:1fr}
+      .contact-grid{grid-template-columns:1fr}
+    }
+    @media (max-width:700px){
+      nav.main-nav{display:none}
+      .mobile-toggle{display:inline-block}
+      .hero{padding:48px 12px}
+      .preview-item img{height:100px}
+      .gallery img{height:140px}
+      .menu-grid{grid-template-columns:1fr}
+    }
+  </style>
+</head>
+<body>
+  <!-- ===== HEADER ===== -->
+  <header class="site-header" role="banner">
+    <div class="wrap header-inner">
+      <div class="brand">
+        <img src="logo.png" alt="LYLYFOOD logo" />
+        <div>
+          <div class="name">LYLYFOOD</div>
+          <div class="tag">Ngon trọn vị — Vui trọn ngày</div>
+        </div>
+      </div>
+
+      <nav class="main-nav" role="navigation" aria-label="Main navigation">
+        <a href="#" data-page="about" class="nav-link active">GIỚI THIỆU</a>
+        <a href="#" data-page="menu" class="nav-link">THỰC ĐƠN</a>
+        <a href="#" data-page="booking" class="nav-link">ĐẶT BÀN</a>
+        <a href="#" data-page="album" class="nav-link">ALBUM</a>
+        <a href="#" data-page="contact" class="nav-link">LIÊN HỆ</a>
+      </nav>
+
+      <div style="display:flex;align-items:center;gap:12px">
+        <div class="search-box" role="search" aria-label="Search">
+          <input type="search" id="site-search" placeholder="Tìm kiếm" aria-label="Tìm kiếm">
+        </div>
+        <button class="mobile-toggle" id="mobileToggle" aria-expanded="false" aria-controls="mobileMenu">☰</button>
+      </div>
+    </div>
+
+    <!-- mobile menu -->
+    <div id="mobileMenu" style="display:none;padding:10px 18px;background:linear-gradient(180deg,var(--header),var(--header-dark))">
+      <div class="wrap" style="padding:0">
+        <nav style="display:flex;flex-direction:umn;gap:8px">
+          <a href="#" data-page="about" class="nav-link">GIỚI THIỆU</a>
+          <a href="#" data-page="menu" class="nav-link">THỰC ĐƠN</a>
+          <a href="#" data-page="booking" class="nav-link">ĐẶT BÀN</a>
+          <a href="#" data-page="album" class="nav-link">ALBUM</a>
+          <a href="#" data-page="contact" class="nav-link">LIÊN HỆ</a>
+        </nav>
+      </div>
+    </div>
+  </header>
+
+  <!-- ===== MAIN: all pages (only one visible at a time) ===== -->
+  <main class="wrap" id="app">
+
+    <!-- ABOUT / HOME -->
+    <section id="about" class="page active" aria-labelledby="aboutTitle">
+      <div class="hero" role="region" aria-label="Về chúng tôi">
+        <h1 id="aboutTitle">VỀ CHÚNG TÔI</h1>
+        <h2>Quán đồ ăn LYLYfood</h2>
+        <div class="msv">MSV : 524107274</div>
+      </div>
+
+      <div class="content" aria-live="polite">
+        <div class="col-left">
+          <div class="card">
+            <h3>LYLYfood - Ngon trọn vị, vui trọn ngày !</h3>
+            <p class="muted">
+              Tại LyLyfood, các bạn sẽ được thưởng thức đủ món ăn vặt “ngon quên lối về” – từ bánh tráng trộn, tokbokki cay nồng đến trà sữa béo ngậy và nhiều món ngon khác đang chờ bạn khám phá.
+            </p>
+            <p class="muted" style="margin-top:8px">
+              Mỗi món ăn đều được chọn nguyên liệu kỹ lưỡng, chế biến sạch sẽ và giữ trọn hương vị tươi ngon nhất, mang đến cảm giác vừa quen thuộc vừa mới lạ.
+            </p>
+            <p class="muted" style="margin-top:8px">
+              Chúng mình tin rằng, một món ăn ngon không chỉ làm no bụng, mà còn mang lại niềm vui, năng lượng và những kỷ niệm khó quên.
+            </p>
+            <p style="margin-top:14px;font-weight:800;color:var(--header-dark)">LyLyfood – Ăn ngon, vui trọn từng khoảnh khắc !</p>
+
+            <!-- small visual preview like Figma -->
+            <div class="menu-preview" style="margin-top:16px">
+              <div class="preview-item"><img src="chả cá.jpg" alt="kimbap"><h4>Chả cá nóng hổi</h4></div>
+              <div class="preview-item"><img src="gt3.webp" alt="garan"><h4>Combo gia đình</h4></div>
+              <div class="preview-item"><img src="cơm trộn.jpg" alt="banhtrang"><h4> Cơm trộn</h4></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-right">
+          <div class="side-image">
+            <img src="Chao mung.png" alt="LyLyfood collage">
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- MENU -->
+    <section id="menu" class="page" aria-labelledby="menuTitle">
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <div>
+          <h2 id="menuTitle" style="margin:0;color:var(--header-dark)">THỰC ĐƠN</h2>
+          <div class="muted" style="margin-top:6px">Menu phong phú và đa dạng — Việt Nam & Hàn Quốc</div>
+        </div>
+        <div>
+          <button class="btn-primary" onclick="showPage('booking')" style="border-radius:8px;border:0;padding:8px 12px;cursor:pointer;background:#fff;color:var(--accent);font-weight:700">Đặt bàn</button>
+        </div>
+      </div>
+
+      <div class="menu-grid" style="margin-top:18px">
+        <article class="dish">
+          <img src="gà cay.jpeg" alt="Gà rán sốt cay">
+          <div>
+            <h4>Gà rán sốt cay</h4>
+            <p class="muted">Lớp vỏ giòn rụm, sốt cay nồng.</p>
+            <div class="price">₫99.000</div>
+          </div>
+        </article>
+
+        <article class="dish">
+          <img src="banh trang.jpeg" alt="Bánh tráng trộn">
+          <div>
+            <h4>Bánh tráng trộn</h4>
+            <p class="muted">Mix vị đặc trưng, hành phi, tóp mỡ.</p>
+            <div class="price">₫45.000</div>
+          </div>
+        </article>
+
+        <article class="dish">
+          <img src="kimbap.jpg" alt="Set kimbap mix">
+          <div>
+            <h4>Set kimbap mix vị</h4>
+            <p class="muted">Nhiều vị, ăn kèm đồ chua ngon miệng.</p>
+            <div class="price">₫89.000</div>
+          </div>
+        </article>
+
+        <article class="dish">
+          <img src="tok.jpg" alt="Tokbokki">
+          <div>
+            <h4>Tokbokki cay</h4>
+            <p class="muted">Bánh gạo Hàn Quốc sốt cay, dai ngon.</p>
+            <div class="price">₫79.000</div>
+          </div>
+        </article>
+
+        <article class="dish">
+          <img src="drink.jpg" alt="Trà sữa">
+          <div>
+            <h4>Trà sữa & siro trái cây</h4>
+            <p class="muted">Trà sữa béo ngậy, nhiều topping.</p>
+            <div class="price">₫49.000</div>
+          </div>
+        </article>
+
+        <article class="dish">
+          <img src="chan ga.jpg" alt="Chân gà xả tắc">
+          <div>
+            <h4>Chân gà xả tắc</h4>
+            <p class="muted">Chua cay, thơm mùi xả.</p>
+            <div class="price">₫69.000</div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- BOOKING -->
+    <section id="booking" class="page" aria-labelledby="bookingTitle">
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <h2 id="bookingTitle" style="margin:0;color:var(--header-dark)">ĐẶT BÀN</h2>
+        <div class="muted">Chúng tôi sẽ gọi xác nhận trong giờ làm việc</div>
+      </div>
+
+      <div class="booking-grid" style="margin-top:16px">
+        <form class="card" id="bookingForm" onsubmit="handleBooking(event)" novalidate>
+          <div style="display:flex;gap:10px;flex-wrap:wrap">
+            <div style="flex:1;min-width:140px">
+              <label for="bk_name">Họ và tên</label>
+              <input id="bk_name" name="name" type="text" placeholder="Nguyễn Văn A" required>
+            </div>
+            <div style="flex:1;min-width:140px">
+              <label for="bk_phone">Số điện thoại</label>
+              <input id="bk_phone" name="phone" type="tel" placeholder="0355 769 851" required pattern="[0-9+().\- ]{7,}">
+            </div>
+          </div>
+
+          <div class="form-row" style="margin-top:8px">
+            <div class="col">
+              <label for="bk_date">Ngày</label>
+              <input id="bk_date" name="date" type="date" required>
+            </div>
+            <div class="col">
+              <label for="bk_time">Giờ</label>
+              <input id="bk_time" name="time" type="time" required>
+            </div>
+          </div>
+
+          <div style="margin-top:8px">
+            <label for="bk_people">Số người</label>
+            <select id="bk_people" name="people" required>
+              <option value="">Chọn</option>
+              <option value="1-2">1-2</option>
+              <option value="3-4">3-4</option>
+              <option value="5-8">5-8</option>
+              <option value=">8">&gt;8</option>
+            </select>
+          </div>
+
+          <div style="margin-top:8px">
+            <label for="bk_note">Yêu cầu / Ghi chú</label>
+            <textarea id="bk_note" name="note" rows="3" placeholder="Ví dụ: chỗ ngồi riêng, sinh nhật..."></textarea>
+          </div>
+
+          <div style="margin-top:12px;display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+            <button class="btn-primary" type="submit">Gửi yêu cầu</button>
+            <div id="bk_msg" class="muted" aria-live="polite"></div>
+          </div>
+        </form>
+
+        <aside class="contact-card">
+          <h4 style="margin-top:0">Thông tin quán</h4>
+          <p class="muted">Địa chỉ: 37 Quang Trung, Q. Hoàn Kiếm, Hà Nội</p>
+          <p class="muted">Hotline: <strong>0355 769 851</strong></p>
+          <p class="muted">Email: lylyfood@gmail.com</p>
+          <p class="muted">(Quán không có chỗ để xe ô tô)</p>
+
+          <div style="margin-top:12px" class="muted">
+            <strong>Ghi chú:</strong>
+            <ul style="margin:8px 0 0;padding-left:16px;color:var(--muted)">
+              <li>Chúng tôi sẽ gọi xác nhận trong vòng 30 phút (trong giờ làm việc).</li>
+              <li>Vui lòng đến đúng giờ để giữ chỗ.</li>
+            </ul>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <!-- ALBUM -->
+    <section id="album" class="page" aria-labelledby="albumTitle">
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <h2 id="albumTitle" style="margin:0;color:var(--header-dark)">ALBUM</h2>
+        <div class="muted">Những khoảnh khắc & món ăn tại LyLyfood</div>
+      </div>
+
+      <div class="gallery" style="margin-top:16px">
+        <img src="sảnh1.jpg" alt="gallery1">
+        <img src="sảnh 2.png" alt="gallery2">
+        <img src="sảnh 3.webp" alt="gallery3">
+        <img src="sảnh 4.jpg" alt="gallery4">
+        <img src="gt1.jpg" alt="gallery5">
+        <img src="gt2.jpg" alt="gallery6">
+      </div>
+    </section>
+
+    <!-- CONTACT -->
+    <section id="contact" class="page" aria-labelledby="contactTitle">
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <h2 id="contactTitle" style="margin:0;color:var(--header-dark)">LIÊN HỆ</h2>
+        <div class="muted">Thông tin liên lạc & mạng xã hội</div>
+      </div>
+
+      <div class="contact-grid" style="margin-top:16px">
+        <div>
+          <div class="contact-card" style="margin-bottom:12px">
+            <h4 style="margin-top:0">Địa chỉ & Liên hệ</h4>
+            <p class="muted">37 Quang Trung, Q. Hoàn Kiếm, Hà Nội</p>
+            <p class="muted">Hotline: 0355 769 851</p>
+            <p class="muted">Email: lylyfood@gmail.com</p>
+            <p class="muted">Giờ mở cửa: 9:00 - 21:00</p>
+          </div>
+
+          <div class="contact-card">
+            <h4 style="margin-top:0">Gửi tin nhắn</h4>
+            <form id="contactForm" onsubmit="handleContact(event)" novalidate>
+              <label for="ct_name">Tên</label>
+              <input id="ct_name" name="name" required>
+              <label for="ct_email">Email</label>
+              <input id="ct_email" type="email" name="email" required>
+              <label for="ct_msg">Nội dung</label>
+              <textarea id="ct_msg" name="message" rows="4" required></textarea>
+              <div style="margin-top:8px;display:flex;gap:8px;align-items:center">
+                <button class="btn-primary" type="submit">Gửi</button>
+                <div id="ct_msg_status" class="muted" aria-live="polite"></div>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <aside class="contact-card center">
+          <h4 style="margin-top:0">Theo dõi chúng tôi</h4>
+          <div class="socials" style="margin-top:8px">
+            <a href="#" aria-label="Facebook">Facebook</a> •
+            <a href="#" aria-label="Instagram">Instagram</a> •
+            <a href="#" aria-label="Tiktok">Tiktok</a>
+          </div><div class="socials" style="margin-top:8px;display:flex;justify-content:center;gap:18px">
+  <a href="https://www.facebook.com/share/1CTcdYHNbp/?mibextid=wwXIfr" target="_blank" aria-label="Facebook">
+    <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/facebook.svg" alt="Facebook" width="30" height="30" style="filter:invert(50%) sepia(20%) saturate(800%) hue-rotate(20deg) brightness(95%) contrast(90%);transition:transform .2s">
+  </a>
+  <a href="https://www.instagram.com/theb6.hanoi?igsh=d3hua3JmaWdtMWQ5" target="_blank" aria-label="Instagram">
+    <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/instagram.svg" alt="Instagram" width="30" height="30" style="filter:invert(50%) sepia(20%) saturate(800%) hue-rotate(20deg) brightness(95%) contrast(90%);transition:transform .2s">
+  </a>
+  <a href="https://www.tiktok.com/@theb6vn?_r=1&_t=ZS-91BmdhTCATA" target="_blank" aria-label="Tiktok">
+    <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/tiktok.svg" alt="Tiktok" width="30" height="30" style="filter:invert(50%) sepia(20%) saturate(800%) hue-rotate(20deg) brightness(95%) contrast(90%);transition:transform .2s">
+  </a>
+</div>
+
+
+          <div style="margin-top:18px" class="muted">MSV: 524107274</div>
+        </aside>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ===== FOOTER ===== -->
+  <footer class="site-footer" role="contentinfo">
+    <div class="wrap">
+      <div style="text-align:left">
+        <strong>LYLYFOOD</strong><br>
+        Địa chỉ: 37 Quang Trung, Q. Hoàn Kiếm, Hà Nội<br>
+        Hotline: 0355 769 851 • Email: lylyfood@gmail.com
+      </div>
+      <div style="text-align:right">
+        © 2025 LYLYFOOD — Thiết kế theo Figma
+      </div>
+    </div>
+  </footer>
+
+  <!-- ===== SCRIPTS: navigation, forms, small UX ===== -->
+  <script>
+    // Navigation: show page by data-page
+    (function(){
+      const links = document.querySelectorAll('.nav-link');
+      const pages = document.querySelectorAll('section.page');
+      const mobileToggle = document.getElementById('mobileToggle');
+      const mobileMenu = document.getElementById('mobileMenu');
+
+      function setActive(pageId, pushState = true){
+        pages.forEach(p => {
+          p.id === pageId ? p.classList.add('active') : p.classList.remove('active');
+        });
+        links.forEach(l => {
+          l.getAttribute('data-page') === pageId ? l.classList.add('active') : l.classList.remove('active');
+        });
+        if(pushState) history.replaceState(null, '', '#' + pageId);
+        window.scrollTo({top:0,behavior:'smooth'});
+        // close mobile menu if open
+        if(window.innerWidth < 700 && mobileMenu.style.display === 'block'){
+          mobileMenu.style.display = 'none';
+          mobileToggle.setAttribute('aria-expanded','false');
+        }
+      }
+
+      // attach click
+      links.forEach(a => {
+        a.addEventListener('click', e => {
+          e.preventDefault();
+          const target = a.getAttribute('data-page');
+          if(target) setActive(target);
+        });
+      });
+
+      // open initial from hash
+      const initial = location.hash.replace('#','') || 'about';
+      if(document.getElementById(initial)) setActive(initial, false);
+
+      // mobile toggle
+      if(mobileToggle){
+        mobileToggle.addEventListener('click', () => {
+          const shown = mobileMenu.style.display === 'block';
+          mobileMenu.style.display = shown ? 'none' : 'block';
+          mobileToggle.setAttribute('aria-expanded', String(!shown));
+        });
+      }
+    })();
+
+    // Booking handler (client-side)
+    function handleBooking(e){
+      e.preventDefault();
+      const name = document.getElementById('bk_name').value.trim();
+      const phone = document.getElementById('bk_phone').value.trim();
+      const date = document.getElementById('bk_date').value;
+      const time = document.getElementById('bk_time').value;
+      const msgEl = document.getElementById('bk_msg');
+
+      if(!name || !phone || !date || !time){
+        msgEl.style.color = 'crimson';
+        msgEl.textContent = 'Vui lòng điền đầy đủ thông tin.';
+        return;
+      }
+      msgEl.style.color = 'green';
+      msgEl.textContent = 'Gửi thành công! Chúng tôi sẽ gọi xác nhận sớm.';
+      e.target.reset();
+      // TODO: send to backend via fetch() if you have API
+    }
+
+    // Contact handler
+    function handleContact(e){
+      e.preventDefault();
+      const name = document.getElementById('ct_name').value.trim();
+      const email = document.getElementById('ct_email').value.trim();
+      const text = document.getElementById('ct_msg').value.trim();
+      const status = document.getElementById('ct_msg_status');
+      if(!name || !email || !text){
+        status.style.color = 'crimson';
+        status.textContent = 'Nhập đầy đủ thông tin';
+        return;
+      }
+      status.style.color = 'green';
+      status.textContent = 'Gửi thành công! Cảm ơn bạn.';
+      e.target.reset();
+    }
+
+    // simple image lazy load (if many images)
+    (function(){
+      const imgs = document.querySelectorAll('img');
+      imgs.forEach(img => {
+        if(img.getAttribute('data-src')){
+          img.src = img.getAttribute('data-src');
+          img.removeAttribute('data-src');
+        }
+      });
+    })();
+
+    // small helper to programmatically show page
+    function showPage(id){ if(document.getElementById(id)) {
+      document.querySelectorAll('.nav-link').forEach(l => {
+        if(l.getAttribute('data-page') === id) l.classList.add('active'); else l.classList.remove('active');
+      });
+      document.querySelectorAll('section.page').forEach(s => s.id === id ? s.classList.add('active') : s.classList.remove('active'));
+      history.replaceState(null,'','#'+id);
+      window.scrollTo({top:0,behavior:'smooth'});
+    } }
+  </script>
+</body>
+</html>
